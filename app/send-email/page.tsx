@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 export default function SendEmailForm() {
-    const [email, setEmail] = useState('unreal@vanishingpoint3d.com');
+    const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -64,26 +64,25 @@ export default function SendEmailForm() {
     };
 
     return (
-        <div className='min-h-screen flex items-center justify-center bg-gray-100'>
-            <div className='bg-white p-8 rounded-lg shadow-md w-96'>
-                <form onSubmit={handleSubmit} className='space-y-4'>
+        <div>
+            <div>
+                <form onSubmit={handleSubmit}>
                     <div>
-                        <label className='block text-sm font-medium mb-2'>Nombre</label>
+                        <label>Nombre</label>
                         <input
                             type='text'
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className='w-full px-3 py-2 border rounded-md'
                             required
                         />
                     </div>
-                    <div style={{ display: 'none' }}>
+                    {/* <div style={{ display: 'none' }}> */}
+                    <div >
                         <label>Email Destinatario</label>
                         <input
                             type='email'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className='w-full px-3 py-2 border rounded-md'
                             required
                         />
                     </div>
@@ -92,16 +91,20 @@ export default function SendEmailForm() {
                         id="json-file-input"
                         accept=".json"
                         onChange={handleJsonUpload}
-                        className="hidden"
                         required
                     />
                     <div className="flex gap-2">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
                         >
                             {loading ? 'Sending...' : 'Send Email'}
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                        >
+                            Downlaod data
                         </button>
                     </div>
 
