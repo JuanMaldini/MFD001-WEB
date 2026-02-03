@@ -56,7 +56,6 @@ export default function Home() {
         const json = JSON.parse(event.target?.result as string);
         setJsonData(json);
         setJsonFileName(file.name);
-        setMessage(`Loading Json: ${file.name}`);
       } catch (error) {
         setMessage('Error parsing JSON file');
         setJsonData(null);
@@ -80,8 +79,8 @@ export default function Home() {
               required
             />
           </div>
-          <div>
-            <label className='block text-sm font-medium mb-2'>Email Destinatario</label>
+          <div style={{ display: 'none' }}>
+            <label>Email Destinatario</label>
             <input
               type='email'
               value={email}
@@ -90,7 +89,6 @@ export default function Home() {
               required
             />
           </div>
-
           <input
             type="file"
             id="json-file-input"
@@ -99,7 +97,6 @@ export default function Home() {
             className="hidden"
             required
           />
-
           <div className="flex gap-2">
             <button
               type="submit"
@@ -111,7 +108,6 @@ export default function Home() {
           </div>
 
         </form>
-        {message && <p className='mt-4 text-center'>{message}</p>}
       </div>
     </div>
   );
