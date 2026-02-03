@@ -110,11 +110,6 @@ export default function Home() {
             </button>
           </div>
 
-          {jsonFileName && (
-            <div className="text-sm text-green-600 text-center">
-              Archivo adjunto: {jsonFileName}
-            </div>
-          )}
         </form>
         {message && <p className='mt-4 text-center'>{message}</p>}
       </div>

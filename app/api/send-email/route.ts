@@ -16,13 +16,13 @@ export async function POST(request: NextRequest) {
       jsonId = storeJson(jsonData);
     }
 
-    // Get base URL dynamically from request headers
     const protocol = request.headers.get('x-forwarded-proto') || 'http';
     const host = request.headers.get('host') || 'localhost:3000';
     const baseUrl = `${protocol}://${host}`;
 
     await sendEmail(
       to,
+      //EMAIL SUBJECT
       'Requested quota from Web App',
       WelcomeEmail({ userName, userEmail: to, jsonId, baseUrl })
     );
