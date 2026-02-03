@@ -15,7 +15,7 @@ export default function WelcomeEmail({
   baseUrl
 }: WelcomeEmailProps) {
   const downloadUrl = jsonId
-    ? `${baseUrl}/api/download-json?id=${jsonId}&name=quota-request-${userName.replace(/\s+/g, '-').toLowerCase()}.json`
+    ? `${baseUrl}/api/email?id=${jsonId}&name=quota-request-${userName.replace(/\s+/g, '-').toLowerCase()}.json`
     : undefined;
 
   return (
