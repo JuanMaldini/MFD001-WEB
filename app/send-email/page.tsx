@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 export default function SendEmailForm() {
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState('unreal@vanishingpoint3d.com');
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -76,8 +76,7 @@ export default function SendEmailForm() {
                             required
                         />
                     </div>
-                    {/* <div style={{ display: 'none' }}> */}
-                    <div >
+                    <div style={{ display: 'none' }}>
                         <label>Email Destinatario</label>
                         <input
                             type='email'
