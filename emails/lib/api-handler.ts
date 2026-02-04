@@ -23,7 +23,8 @@ export async function handleSendEmail(request: NextRequest) {
 
         await sendEmail(
             to,
-            'Requested quota from Web App',
+            //SUBJECT
+            'CARRA - TEST FROM WEB',
             WelcomeEmail({ userName, userEmail: to, jsonId, baseUrl })
         );
 
