@@ -24,6 +24,7 @@ type BottomSealType = 'automatic' | 'operable'; // Simplified for UI demo
 type FinishType = 'tba' | 'vinyl' | 'fabric' | 'carpet' | 'com';
 type HingeType = 'standard' | 'soss';
 type TrimColor = 'clear' | 'bronze' | 'black' | 'white' | 'custom';
+type WorkSurfaceType = 'marker_board' | 'tack_board';
 
 interface ProjectInfo {
     projectName: string;
@@ -62,6 +63,7 @@ export default function OperablePartition() {
   const [trimColor, setTrimColor] = useState<TrimColor | null>(null);
   const [passdoor, setPassdoor] = useState(false);
   const [workSurface, setWorkSurface] = useState(false);
+  const [workSurfaceType, setWorkSurfaceType] = useState<WorkSurfaceType>('marker_board');
 
   // New State for Project Info
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
@@ -201,6 +203,7 @@ export default function OperablePartition() {
     setTrimColor(null);
     setPassdoor(false);
     setWorkSurface(false);
+    setWorkSurfaceType('marker_board');
     setProjectInfo({ projectName: '', city: '', state: '', zip: '', architect: '', contactPerson: '', email: '', phone: '' });
     setCurrentStep('dimensions');
   };
@@ -719,11 +722,12 @@ export default function OperablePartition() {
 
   const renderFinishStep = () => {
       const options = [
+
           { id: 'tba' as FinishType, title: 'To Be Advised', description: 'Finish selection will be decided later.' },
-          { id: 'vinyl' as FinishType, title: 'Vinyl', description: 'Durable, easy-to-clean vinyl covering.' },
+          { id: 'vinyl' as FinishType, title: 'Vinyl', description: 'Standard commercial grade vinyl covering.' },
           { id: 'fabric' as FinishType, title: 'Fabric', description: 'Acoustically transparent fabric options.' },
-          { id: 'carpet' as FinishType, title: 'Carpet', description: 'Robust carpet finish for high-traffic areas.' },
-          { id: 'com' as FinishType, title: "Customer's Own (COM)", description: 'Use your own custom material.' },
+          { id: 'carpet' as FinishType, title: 'Carpet', description: 'Heavy-duty acoustic carpet.' },
+          { id: 'com' as FinishType, title: "Customer's Own (COM)", description: 'Send your own material for application.' },
       ];
 
       return (
@@ -836,27 +840,30 @@ export default function OperablePartition() {
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl mb-8">
                 <h2 className="text-2xl font-bold text-white mb-2">Additional Options</h2>
-                <p className="text-slate-400 text-sm">Select any optional features.</p>
+                <p className="text-slate-400 text-sm">Select whether a passdoor or worksurface is needed.</p>
             </div>
 
             <div className="space-y-4">
                 {/* Passdoor */}
                 <button
                     onClick={() => setPassdoor(!passdoor)}
-                    className={`w-full text-left p-6 rounded-2xl border transition-all flex items-center justify-between ${
+                    className={`w-full text-left p-6 rounded-2xl border transition-all flex items-start justify-between ${
                         passdoor 
                         ? 'bg-emerald-500/10 border-emerald-500' 
                         : 'bg-white/5 border-white/10 hover:border-white/20'
                     }`}
                 >
                     <div>
-                         <h3 className={`text-xl font-bold ${passdoor ? 'text-emerald-400' : 'text-white'}`}>Passdoor</h3>
-                         <div className="text-slate-400 text-sm mt-2 space-y-1">
-                             <p>• ADA Compliant Hardware</p>
-                             <p>• Exit Signs & Viewers Included</p>
-                         </div>
+                         <h3 className={`text-xl font-bold mb-3 ${passdoor ? 'text-emerald-400' : 'text-white'}`}>Passdoor</h3>
+                         <ul className="text-slate-400 text-sm space-y-2 list-disc pl-4 marker:text-emerald-500/50">
+                             <li>ADA Compliant Hardware</li>
+                             <li>Surface mounted or recessed exit signs</li>
+                             <li>Door viewer option</li>
+                             <li>Window option</li>
+                             <li>Matching or hollow metal construction available</li>
+                         </ul>
                     </div>
-                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all mt-1 ${
                         passdoor ? 'bg-emerald-500 text-black' : 'bg-white/10 text-transparent'
                     }`}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
@@ -866,29 +873,60 @@ export default function OperablePartition() {
                 </button>
 
                  {/* Worksurface */}
-                <button
-                    onClick={() => setWorkSurface(!workSurface)}
-                    className={`w-full text-left p-6 rounded-2xl border transition-all flex items-center justify-between ${
+                 <div className={`rounded-2xl border transition-all overflow-hidden ${
                         workSurface 
-                        ? 'bg-emerald-500/10 border-emerald-500' 
+                        ? 'bg-emerald-500/5 border-emerald-500' 
                         : 'bg-white/5 border-white/10 hover:border-white/20'
-                    }`}
-                >
-                    <div>
-                         <h3 className={`text-xl font-bold ${workSurface ? 'text-emerald-400' : 'text-white'}`}>Worksurface</h3>
-                         <div className="text-slate-400 text-sm mt-2 space-y-1">
-                             <p>• Dry Marker Boards or Tack Surfaces</p>
-                             <p>• Integrated into panel faces</p>
-                         </div>
-                    </div>
-                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                        workSurface ? 'bg-emerald-500 text-black' : 'bg-white/10 text-transparent'
                     }`}>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                            <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
-                        </svg>
-                    </div>
-                </button>
+                    <button
+                        onClick={() => setWorkSurface(!workSurface)}
+                        className="w-full text-left p-6 flex items-start justify-between"
+                    >
+                        <div>
+                             <h3 className={`text-xl font-bold mb-3 ${workSurface ? 'text-emerald-400' : 'text-white'}`}>Worksurface</h3>
+                             <ul className="text-slate-400 text-sm space-y-2 list-disc pl-4 marker:text-emerald-500/50">
+                                 <li>Dry Marker Boards or Tack Surfaces</li>
+                                 <li>4' by 4' or Full Height / Width of Panel</li>
+                                 <li>Standard file line feature creates continuous surface</li>
+                             </ul>
+                        </div>
+                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all mt-1 ${
+                            workSurface ? 'bg-emerald-500 text-black' : 'bg-white/10 text-transparent'
+                        }`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                                <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                    </button>
+
+                    {/* Sub-options for Worksurface */}
+                    {workSurface && (
+                        <div className="px-6 pb-6 pt-2 animate-in slide-in-from-top-2 duration-300">
+                            <div className="grid grid-cols-2 gap-3 p-1 bg-black/40 rounded-xl">
+                                <button
+                                    onClick={() => setWorkSurfaceType('marker_board')}
+                                    className={`py-3 px-4 rounded-lg text-sm font-bold transition-all ${
+                                        workSurfaceType === 'marker_board'
+                                        ? 'bg-emerald-500 text-black shadow-lg'
+                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                    }`}
+                                >
+                                    Marker Board
+                                </button>
+                                <button
+                                    onClick={() => setWorkSurfaceType('tack_board')}
+                                    className={`py-3 px-4 rounded-lg text-sm font-bold transition-all ${
+                                        workSurfaceType === 'tack_board'
+                                        ? 'bg-emerald-500 text-black shadow-lg'
+                                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                    }`}
+                                >
+                                    Tack Board
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
        );
@@ -1125,9 +1163,16 @@ export default function OperablePartition() {
                 {(passdoor || workSurface) && (
                      <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md animate-in zoom-in duration-500 flex flex-col gap-2 delay-700">
                         <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest block">Extras</span>
-                        <div className="flex gap-2 flex-wrap">
-                            {passdoor &&  <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">Passdoor</span>}
-                            {workSurface &&  <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold">Worksurface</span>}
+                        <div className="flex gap-2 flex-col">
+                            {passdoor &&  <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold w-max">Passdoor</span>}
+                            {workSurface && (
+                                <div className="flex items-center gap-2">
+                                     <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 text-xs font-bold w-max">Worksurface</span>
+                                     <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">
+                                         ({workSurfaceType === 'marker_board' ? 'Marker' : 'Tack'})
+                                     </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -1273,7 +1318,7 @@ export default function OperablePartition() {
                              <span className="text-slate-500">Extras:</span> 
                              <div className="text-right flex flex-col">
                                 {passdoor && <span>Passdoor</span>}
-                                {workSurface && <span>Worksurface</span>}
+                                {workSurface && <span>Worksurface ({workSurfaceType === 'marker_board' ? 'Marker' : 'Tack'})</span>}
                                 {!passdoor && !workSurface && <span>None</span>}
                              </div>
                         </div>
