@@ -1,40 +1,58 @@
 'use client';
 import { useRef, useEffect, useState } from "react";
 import Sidepanel from "./sidepanel/Sidepanel";
+import '@n8n/chat/dist/style.css';
+import { createChat } from '@n8n/chat';
+import Script from "next/script";
 
-function E3DSPlayer() {
+function VagonPlayer() {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [url, setUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (process.env.PASS_E3DS_URL) {
-      setUrl(process.env.PASS_E3DS_URL);
+    // We keep the env variable name as requested to preserve folder context if needed, 
+    // but typically Vagon URLs come from a different source.
+    if (process.env.NEXT_PUBLIC_VAGON_STREAM_URL) {
+      setUrl(process.env.NEXT_PUBLIC_VAGON_STREAM_URL);
     }
+  }, []);
 
-    const iframeElement = iframeRef.current;
-    if (!iframeElement) return;
-
-    const handleMessageFromE3DS = (event: MessageEvent) => {
-      console.log("[E3DS] Mensaje recibido:", event.data);
-    };
-
-    window.addEventListener("message", handleMessageFromE3DS);
-
-    return () => {
-      window.removeEventListener("message", handleMessageFromE3DS);
-    };
+  useEffect(() => {
+    createChat({
+      webhookUrl: 'http://localhost:5678/webhook/f4f1ffe0-dee2-472c-90d0-95ffd6919067/chat',
+      mode: 'window',
+      showWelcomeScreen: true,
+      initialMessages: [
+        'Do you need guidance to build some steps?'
+      ],
+      i18n: {
+        en: {
+          title: 'Hi there! 👋',
+          subtitle: "Start a chat. We're here to help you 24/7.",
+          footer: '',
+          getStarted: 'New Conversation',
+          inputPlaceholder: 'Type your question...',
+          closeButtonTooltip: 'Close Chat',
+        },
+      },
+    });
   }, []);
 
   return (
     <div className="flex flex-col md:flex-row w-full h-screen">
+      <Script
+        src="https://streams.vagon.io/sdk/v1/vagon.js"
+        strategy="beforeInteractive"
+      />
+
       <div className="w-full md:w-3/4 h-1/2 md:h-full">
         <iframe
           ref={iframeRef}
-          id="iframe_1"
+          id="vagon-iframe"
           src={url}
           className="w-full h-full border-0"
           allowFullScreen
-          />
+        />
       </div>
 
       <div className="w-full md:w-1/4 h-1/2 md:h-full">
@@ -44,4 +62,4 @@ function E3DSPlayer() {
   );
 }
 
-export default E3DSPlayer;
+export default VagonPlayer;
