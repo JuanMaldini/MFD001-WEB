@@ -5,7 +5,8 @@ import { storeJson, getJson } from '@/emails/lib/json-storage';
 
 export async function handleSendEmail(request: NextRequest) {
     try {
-        const { to, userName, userEmail, jsonData } = await request.json();
+        const body = await request.json();
+        const { to, userName, userEmail, jsonData } = body;
 
         if (!to) {
             return NextResponse.json({ error: 'Email destinatario requerido' }, { status: 400 });
@@ -48,7 +49,8 @@ export async function handleDownloadJson(request: NextRequest) {
             return NextResponse.json({ error: 'JSON no encontrado o expirado' }, { status: 404 });
         }
 
-        const jsonString = JSON.stringify(jsonData, null, 2);
+        // Si ya es un string (raw JSON), lo enviamos directo. Si es objeto, lo stringificamos.
+        const jsonString = typeof jsonData === 'string' ? jsonData : JSON.stringify(jsonData, null, 2);
 
         return new NextResponse(jsonString, {
             status: 200,

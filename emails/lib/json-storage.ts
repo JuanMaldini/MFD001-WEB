@@ -1,5 +1,5 @@
 interface StoredJson {
-    data: Record<string, any>;
+    data: any;
     timestamp: number;
 }
 
@@ -11,7 +11,7 @@ export function generateJsonId(): string {
     return `json-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 }
 
-export function storeJson(data: Record<string, any>): string {
+export function storeJson(data: any): string {
     const id = generateJsonId();
     jsonStore.set(id, {
         data,
@@ -23,7 +23,7 @@ export function storeJson(data: Record<string, any>): string {
     return id;
 }
 
-export function getJson(id: string): Record<string, any> | null {
+export function getJson(id: string): any | null {
     const stored = jsonStore.get(id);
 
     if (!stored) {

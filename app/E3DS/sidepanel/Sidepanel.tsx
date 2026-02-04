@@ -23,6 +23,8 @@ export default function Sidepanel() {
             <span className="sp-action-label">Confirm</span>
           </button>
 
+          
+
         </div>
       </div>
 
