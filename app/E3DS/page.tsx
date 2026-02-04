@@ -34,7 +34,7 @@ function E3DSPlayer() {
           src={url}
           className="w-full h-full border-0"
           allowFullScreen
-        />
+          />
       </div>
 
       <div className="w-full md:w-1/4 h-1/2 md:h-full">
