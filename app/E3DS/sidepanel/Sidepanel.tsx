@@ -14,7 +14,6 @@ export default function Sidepanel() {
 
       <div>
         <div>
-
           <button
             type="button"
             className="sp-action-btn"
@@ -22,9 +21,6 @@ export default function Sidepanel() {
             title={"Play / Stop — payload: Video: Play"}>
             <span className="sp-action-label">Confirm</span>
           </button>
-
-          
-
         </div>
       </div>
 

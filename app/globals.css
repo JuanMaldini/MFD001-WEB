@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    --selection-bg: rgba(16, 185, 129, 0.3);
+  }
+
+  ::selection {
+    background-color: var(--selection-bg);
+    color: white;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 10px;
+    border: 2px solid #0a0a0a;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3f3f46;
+  }
+
+  body {
+    @apply bg-[#0a0a0a] text-slate-200 antialiased;
+  }
+}
