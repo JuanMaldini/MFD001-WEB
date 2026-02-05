@@ -35,7 +35,7 @@ export default function SendEmailForm() {
             const data = await response.json();
 
             if (response.ok) {
-                setMessage('Email enviado con éxito');
+                setMessage('Success');
                 setEmail('unreal@vanishingpoint3d.com');
                 setName('');
                 setJsonData(null);
@@ -46,7 +46,7 @@ export default function SendEmailForm() {
                 setMessage('Error: ' + data.error);
             }
         } catch (error) {
-            setMessage('Error al enviar el correo');
+            setMessage('Error sending email');
         } finally {
             setLoading(false);
         }

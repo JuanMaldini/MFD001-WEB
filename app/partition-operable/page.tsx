@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { buildOperableJson } from "@/app/api/formatter";
 
 type DimensionMode = "inches" | "feet-inches" | "metric";
 type Step =
@@ -141,6 +142,7 @@ export default function OperablePartition() {
     email: "",
     phone: "",
   });
+  const [isSending, setIsSending] = useState(false);
 
   // Validation function for step 1
   const validateDimensions = () => {
@@ -228,6 +230,87 @@ export default function OperablePartition() {
 
   const isEmailValid = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  };
+
+  const getUserName = () => {
+    return (
+      projectInfo.contactPerson.trim() ||
+      projectInfo.projectName.trim() ||
+      "User"
+    );
+  };
+
+  const buildJsonPayload = () => {
+    return buildOperableJson({
+      location,
+      width,
+      height,
+      panelConfig,
+      pocketType,
+      hasPocketDoor,
+      durability,
+      stc,
+      closure,
+      track,
+      bottomSeal,
+      finishType,
+      hingeType,
+      trimColor,
+      passdoor,
+      workSurface,
+      workSurfaceType,
+      projectInfo,
+    });
+  };
+
+  const handleRequestQuote = async () => {
+    if (!isFormComplete() || !isEmailValid(projectInfo.email)) return;
+    if (isSending) return;
+
+    setIsSending(true);
+    try {
+      const response = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: "unreal@vanishingpoint3d.com",
+          userName: getUserName(),
+          userEmail: projectInfo.email,
+          jsonData: buildJsonPayload(),
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        alert(`Error: ${data.error || "Error al enviar el correo"}`);
+        return;
+      }
+
+      alert("Email enviado con éxito");
+    } catch (error) {
+      alert("Error al enviar el correo");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleDownloadJson = () => {
+    if (!isFormComplete() || !isEmailValid(projectInfo.email)) return;
+    const jsonData = buildJsonPayload();
+    const fileName = `quota-request-${getUserName()
+      .replace(/\s+/g, "-")
+      .toLowerCase()}.json`;
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   const handleNextStep = () => {
@@ -1349,7 +1432,7 @@ export default function OperablePartition() {
           </h2>
           <p className="text-slate-400 text-sm">
             Please provide details about the project.
-          </p> 
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -1696,25 +1779,54 @@ export default function OperablePartition() {
                       <span className="text-right">
                         {projectInfo.contactPerson}
                       </span>
-                      <span className="text-slate-500">Email:</span>{" "}
-                      <span className="text-right">{projectInfo.email}</span>
                     </div>
                   </div>
 
                   <div className="pt-3">
-                    <button
-                      type="button"
-                      disabled={
-                        !isFormComplete() || !isEmailValid(projectInfo.email)
-                      }
-                      className={`w-full rounded-md py-2 text-sm font-bold transition-all ${
-                        isFormComplete() && isEmailValid(projectInfo.email)
-                          ? `bg-${ACCENT} text-black`
-                          : "bg-white/10 text-slate-500 cursor-not-allowed"
-                      }`}
-                    >
-                      Request a quote
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleRequestQuote}
+                        disabled={
+                          !isFormComplete() ||
+                          !isEmailValid(projectInfo.email) ||
+                          isSending
+                        }
+                        className={`flex-1 rounded-md py-2 text-sm font-bold transition-all ${
+                          isFormComplete() && isEmailValid(projectInfo.email)
+                            ? `bg-${ACCENT} text-black`
+                            : "bg-white/10 text-slate-500 cursor-not-allowed"
+                        }`}
+                      >
+                        {isSending ? "Sending..." : "Request a quote"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDownloadJson}
+                        disabled={
+                          !isFormComplete() || !isEmailValid(projectInfo.email)
+                        }
+                        className={`w-10 h-10 rounded-md border flex items-center justify-center transition-all ${
+                          isFormComplete() && isEmailValid(projectInfo.email)
+                            ? "bg-white/5 border-white/10 hover:border-emerald-500/50"
+                            : "bg-white/5 border-white/10 text-slate-500 cursor-not-allowed"
+                        }`}
+                        title="Download JSON"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="w-5 h-5"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M12 3.75a.75.75 0 01.75.75v8.69l2.47-2.47a.75.75 0 111.06 1.06l-3.75 3.75a.75.75 0 01-1.06 0l-3.75-3.75a.75.75 0 111.06-1.06l2.47 2.47V4.5a.75.75 0 01.75-.75zm-7.5 13.5a.75.75 0 01.75-.75h13.5a.75.75 0 010 1.5H5.25a.75.75 0 01-.75-.75z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

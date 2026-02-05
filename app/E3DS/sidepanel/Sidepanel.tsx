@@ -20,6 +20,8 @@ export default function Sidepanel() {
 
   return (
     <div className="bg-slate-900 w-full h-full overflow-y-auto">
+
+      {/*
       <div className="mb-2">
         <p className="text-emerald-400 text-[10px] font-mono bg-black/40 p-3  break-all">
           <span className="text-slate-500 mr-2">STATUS:</span>
@@ -36,9 +38,10 @@ export default function Sidepanel() {
           className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-1 rounded-lg transition-all shadow-lg shadow-emerald-900/20 active:scale-[0.98]"
           onClick={() => handleCommand("Interaction", "ColorChange", "White")}
         >
-          Boton Vagon
+          Vagon Button
         </button>
       </div>
+      */}
 
       <div className="mt-2 flex flex-col gap-3">
         <strong className="text-white text-xs uppercase tracking-widest opacity-50">
