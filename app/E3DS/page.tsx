@@ -1,7 +1,7 @@
- 'use client';
+"use client";
 import { useRef, useEffect, useState } from "react";
 import Sidepanel from "./sidepanel/Sidepanel";
-import '@n8n/chat/dist/style.css';
+import "@n8n/chat/dist/style.css";
 import Script from "next/script";
 
 function VagonPlayer() {
@@ -9,7 +9,7 @@ function VagonPlayer() {
   const [url, setUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    // We keep the env variable name as requested to preserve folder context if needed, 
+    // We keep the env variable name as requested to preserve folder context if needed,
     // but typically Vagon URLs come from a different source.
     if (process.env.NEXT_PUBLIC_VAGON_STREAM_URL) {
       setUrl(process.env.NEXT_PUBLIC_VAGON_STREAM_URL);
@@ -18,26 +18,31 @@ function VagonPlayer() {
 
   useEffect(() => {
     // Dynamically import createChat to avoid SSR issues during build
-    import('@n8n/chat').then(({ createChat }) => {
-      createChat({
-        webhookUrl: 'http://localhost:5678/webhook/f4f1ffe0-dee2-472c-90d0-95ffd6919067/chat',
-        mode: 'window',
-        showWelcomeScreen: true,
-        initialMessages: [
-          'Do you need guidance to build some steps?'
-        ],
-        i18n: {
-          en: {
-            title: 'Hello',
-            subtitle: "Need help to build your system?",
-            footer: '',
-            getStarted: 'New Conversation',
-            inputPlaceholder: 'Type your question...',
-            closeButtonTooltip: 'Close Chat',
+    import("@n8n/chat")
+      .then(({ createChat }) => {
+        const webhookUrl =
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:5678/webhook/f4f1ffe0-dee2-472c-90d0-95ffd6919067/chat"
+            : "";
+
+        createChat({
+          webhookUrl,
+          mode: "window",
+          showWelcomeScreen: true,
+          initialMessages: ["Do you need guidance to build some steps?"],
+          i18n: {
+            en: {
+              title: "Hello",
+              subtitle: "Need help to build your system?",
+              footer: "",
+              getStarted: "New Conversation",
+              inputPlaceholder: "Type your question...",
+              closeButtonTooltip: "Close Chat",
+            },
           },
-        },
-      });
-    }).catch(err => console.error("Failed to load chat widget", err));
+        });
+      })
+      .catch((err) => console.error("Failed to load chat widget", err));
   }, []);
 
   return (
