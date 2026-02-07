@@ -559,25 +559,18 @@ export default function GlassPartition() {
   const renderConfigurationStep = () => {
     const options = [
       {
-        id: "single-panel" as PanelConfig,
-        title: "Single Panel",
+        id: "single-panel-90" as PanelConfig,
+        title: "Single Panel 90° Side Stack",
         description:
-          "Individual glass panel configuration. Ideal for simple openings and minimalist designs.",
+          "Single panel system where panels move one at a time and stack at a 90-degree angle.",
         app: "Conference rooms, Office partitions, Private spaces.",
       },
       {
-        id: "dual-panel" as PanelConfig,
-        title: "Dual Panel",
+        id: "single-panel-parallel" as PanelConfig,
+        title: "Single Panel Parallel Stack",
         description:
-          "Two panel system with coordinated operation. Perfect for medium-sized openings requiring flexibility.",
-        app: "Meeting rooms, Breakout spaces, Collaborative areas.",
-      },
-      {
-        id: "multi-panel" as PanelConfig,
-        title: "Multi-Panel",
-        description:
-          "Three or more panels for large openings. Maximum flexibility for space division.",
-        app: "Ballrooms, Large conference halls, Multipurpose spaces.",
+          "Single panel system where panels move one at a time and are stacked parallel to the track run.",
+        app: "Conference rooms, Office partitions, Private spaces.",
       },
     ];
 
