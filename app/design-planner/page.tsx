@@ -9,15 +9,12 @@ function VagonPlayer() {
   const [url, setUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    // We keep the env variable name as requested to preserve folder context if needed,
-    // but typically Vagon URLs come from a different source.
     if (process.env.NEXT_PUBLIC_VAGON_STREAM_URL) {
       setUrl(process.env.NEXT_PUBLIC_VAGON_STREAM_URL);
     }
   }, []);
 
   useEffect(() => {
-    // Dynamically import cr beateChat to avoid SSR issues during build
     import("@n8n/chat")
       .then(({ createChat }) => {
         const webhookUrl =

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
 
 const geistSans = Geist({
@@ -12,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Designplanner Web App",
-    description: "Modernfold Designplanner Web App",
+    title: "Design Planner - Modernfold",
+    description: "Modernfold Design Planner Web App",
     icons: {
     icon: "/modern.png",
     shortcut: "/modern.png",

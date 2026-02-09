@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { buildGlassJson } from "@/app/api/formatter";
 
 type DimensionMode = "inches" | "feet-inches" | "metric";
@@ -180,7 +179,6 @@ export default function GlassPartition() {
   };
 
   const isStepComplete = (step: Step) => {
-    if (!visitedSteps.has(step)) return false;
     switch (step) {
       case "dimensions":
         return isDimensionsComplete();

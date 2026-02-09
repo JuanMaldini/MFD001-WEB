@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { buildOperableJson } from "@/app/api/formatter";
 
 type DimensionMode = "inches" | "feet-inches" | "metric";
@@ -189,7 +188,6 @@ export default function OperablePartition() {
   };
 
   const isStepComplete = (step: Step) => {
-    if (!visitedSteps.has(step)) return false;
     switch (step) {
       case "dimensions":
         return isDimensionsComplete();
@@ -212,7 +210,7 @@ export default function OperablePartition() {
       case "hinge_trim":
         return !!hingeType && !!trimColor;
       case "options":
-        return passdoor || workSurface;
+        return visitedSteps.has("options");
       case "project_info":
         return !!projectInfo.projectName.trim() && !!projectInfo.email.trim();
       case "summary":
