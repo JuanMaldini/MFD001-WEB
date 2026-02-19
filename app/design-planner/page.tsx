@@ -1,17 +1,25 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import React from "react";
+import { useCallback, useEffect, useState } from "react";
 import Sidepanel from "./sidepanel/Sidepanel";
 import "@n8n/chat/dist/style.css";
-import Script from "next/script";
+import Controls_Orbit from "./3DViewer/controls_orbit";
 
-function VagonPlayer() {
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const [url, setUrl] = useState<string | undefined>(undefined);
+const Viewer = Controls_Orbit as React.ComponentType<{
+  onReady?: (api: any) => void;
+  onOverwriteChange?: (value: boolean) => void;
+}>;
 
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_VAGON_STREAM_URL) {
-      setUrl(process.env.NEXT_PUBLIC_VAGON_STREAM_URL);
-    }
+function DesignPlanner() {
+  const [viewerReady, setViewerReady] = useState<any>(null);
+  const [overwriteEnabled, setOverwriteEnabled] = useState(true);
+
+  const handleReady = useCallback((api: any) => {
+    setViewerReady(api);
+  }, []);
+
+  const handleOverwriteChange = useCallback((value: boolean) => {
+    setOverwriteEnabled(value);
   }, []);
 
   useEffect(() => {
@@ -44,26 +52,21 @@ function VagonPlayer() {
 
   return (
     <div className="flex flex-col md:flex-row w-full h-screen">
-      <Script
-        src="https://streams.vagon.io/sdk/v1/vagon.js"
-        strategy="beforeInteractive"
-      />
-
       <div className="w-full md:w-3/4 h-1/2 md:h-full">
-        <iframe
-          ref={iframeRef}
-          id="vagon-iframe"
-          src={url}
-          className="w-full h-full border-0"
-          allowFullScreen
+        <Viewer
+          onReady={handleReady}
+          onOverwriteChange={handleOverwriteChange}
         />
       </div>
 
       <div className="w-full md:w-1/2 h-1/2 md:h-full">
-        <Sidepanel />
+        <Sidepanel
+          viewerReady={viewerReady}
+          overwriteEnabled={overwriteEnabled}
+        />
       </div>
     </div>
   );
 }
 
-export default VagonPlayer;
+export default DesignPlanner;

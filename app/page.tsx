@@ -11,6 +11,16 @@ export default function Home() {
                         Start app
                     </button>
                 </Link>
+                <Link href="/material-preset">
+                    <button className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
+                        Material Presets
+                    </button>
+                </Link>
+                <Link href="/material-viewer">
+                    <button className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
+                        Material Viewer
+                    </button>
+                </Link>
             </div>
 
         </main>
