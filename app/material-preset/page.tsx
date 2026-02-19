@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { materialPresets } from "./data.js";
@@ -8,15 +8,17 @@ import { materialPresets } from "./data.js";
 const MaterialViewerScene = dynamic(
   () => import("../material-viewer/components/MaterialViewerScene.jsx"),
   { ssr: false },
-);
-
+) as React.ComponentType<{
+  materialType?: string;
+  materialParams?: Record<string, unknown> | null;
+  onEnvMapReady?: ((envMap: unknown) => void) | null;
+}>;
 
 const EMPTY_FALLBACK = {
   type: "metal",
   params: null, // MaterialViewerScene falls back to METAL_DEFAULTS
   name: null,
 };
-
 
 export default function MaterialPresetsPage() {
   const [index, setIndex] = useState(0);

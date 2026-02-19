@@ -1,17 +1,6 @@
 "use client";
 
-/**
- * Material Viewer — /material-viewer
- *
- * Live material editor. Uses three parent material definitions (Metal, Glass, Opaque)
- * exposed through MaterialParametersPanel (top-right). The sphere in MaterialViewerScene
- * updates in real time as parameters are adjusted.
- *
- * Layout:
- *   Full-screen dark canvas (bg-[#0a0a0a])
- *   └── MaterialViewerScene  (fills 100%)
- *   └── MaterialParametersPanel  (absolute, top-right overlay)
- */
+
 
 import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
