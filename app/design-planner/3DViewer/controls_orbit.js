@@ -130,13 +130,11 @@ function Controls_Orbit({ onReady, onOverwriteChange } = {}) {
       window.matchMedia("(pointer: coarse)").matches ||
       navigator.maxTouchPoints > 0;
     const renderer = new THREE.WebGLRenderer({
-      antialias: !isTouchDevice,
+      antialias: true,
       preserveDrawingBuffer: true,
     });
     rendererRef.current = renderer;
-    renderer.setPixelRatio(
-      isTouchDevice ? 1 : Math.min(window.devicePixelRatio, 2),
-    );
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
 
@@ -501,6 +499,7 @@ function Controls_Orbit({ onReady, onOverwriteChange } = {}) {
 
           scene.add(model);
           model.updateMatrixWorld(true);
+          overwriteMaterialController.setModel(model);
 
           const finalBox = new THREE.Box3().setFromObject(model);
           const finalCenter = new THREE.Vector3();

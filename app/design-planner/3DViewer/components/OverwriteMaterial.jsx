@@ -1,45 +1,101 @@
 import * as THREE from "three";
 import { BsCircle, BsCircleFill } from "react-icons/bs";
 
+const EDGE_TAG = "__overwrite_edge_lines__";
+const EDGE_ANGLE_THRESHOLD_DEG = 15;
+
 const createOverwriteSceneMaterial = () =>
   new THREE.MeshStandardMaterial({
     color: 0xcfcfcf,
     roughness: 0.55,
     metalness: 0,
-    side: THREE.FrontSide,
+    side: THREE.DoubleSide,
+  });
+
+const createEdgesLineMaterial = () =>
+  new THREE.LineBasicMaterial({
+    color: 0x222222,
+    linewidth: 1,
+    depthTest: true,
+    depthWrite: false,
   });
 
 export const createOverwriteMaterialController = () => {
-  let scene = null;
+  let model = null;
   let enabled = false;
   const overwriteMaterial = createOverwriteSceneMaterial();
+  const edgesLineMaterial = createEdgesLineMaterial();
+  const originalMaterials = new Map();
 
-  const apply = () => {
-    if (!scene) {
-      return;
-    }
+  const addEdgesToMesh = (node) => {
+    if (!node.geometry) return;
+    const edges = new THREE.EdgesGeometry(
+      node.geometry,
+      EDGE_ANGLE_THRESHOLD_DEG,
+    );
+    const lines = new THREE.LineSegments(edges, edgesLineMaterial);
+    lines.name = EDGE_TAG;
+    lines.renderOrder = 1;
+    node.add(lines);
+  };
 
-    scene.overrideMaterial = enabled ? overwriteMaterial : null;
+  const removeEdgesFromMesh = (node) => {
+    const toRemove = node.children.filter((c) => c.name === EDGE_TAG);
+    toRemove.forEach((child) => {
+      node.remove(child);
+      child.geometry?.dispose();
+    });
+  };
+
+  const applyAll = () => {
+    if (!model) return;
+    model.traverse((node) => {
+      if (!node.isMesh) return;
+      if (enabled) {
+        if (!originalMaterials.has(node)) {
+          originalMaterials.set(node, node.material);
+        }
+        node.material = overwriteMaterial;
+        const hasEdges = node.children.some((c) => c.name === EDGE_TAG);
+        if (!hasEdges) addEdgesToMesh(node);
+      } else {
+        const original = originalMaterials.get(node);
+        if (original !== undefined) {
+          node.material = original;
+          originalMaterials.delete(node);
+        }
+        removeEdgesFromMesh(node);
+      }
+    });
+  };
+
+  const clearAll = () => {
+    if (!model) return;
+    model.traverse((node) => {
+      if (!node.isMesh) return;
+      const original = originalMaterials.get(node);
+      if (original !== undefined) {
+        node.material = original;
+        originalMaterials.delete(node);
+      }
+      removeEdgesFromMesh(node);
+    });
   };
 
   return {
-    setScene(nextScene) {
-      if (scene === nextScene) {
-        apply();
-        return;
-      }
+    // Kept for API compatibility — no longer uses scene.overrideMaterial
+    setScene(_nextScene) {},
 
-      if (scene) {
-        scene.overrideMaterial = null;
-      }
-
-      scene = nextScene;
-      apply();
+    setModel(nextModel) {
+      if (model && enabled) clearAll();
+      model = nextModel;
+      if (model) model.updateMatrixWorld(true);
+      applyAll();
     },
 
     setEnabled(nextEnabled) {
       enabled = Boolean(nextEnabled);
-      apply();
+      applyAll();
     },
 
     isEnabled() {
@@ -47,11 +103,10 @@ export const createOverwriteMaterialController = () => {
     },
 
     dispose() {
-      if (scene) {
-        scene.overrideMaterial = null;
-      }
-      scene = null;
+      clearAll();
+      model = null;
       overwriteMaterial.dispose();
+      edgesLineMaterial.dispose();
     },
   };
 };
