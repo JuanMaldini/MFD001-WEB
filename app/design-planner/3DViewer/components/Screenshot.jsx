@@ -1,6 +1,6 @@
 import { BsCamera } from "react-icons/bs";
 
-const SCREENSHOT_FILE_PREFIX = "woloviz_screenshot";
+const SCREENSHOT_FILE_PREFIX = "modernfold_screenshot";
 
 const pad = (value) => String(value).padStart(2, "0");
 
