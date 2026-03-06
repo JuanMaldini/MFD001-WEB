@@ -1,18 +1,69 @@
-import Link from 'next/link';
-import "./globals.css";
+"use client";
+import { useRef, useEffect, useState } from "react";
+import Sidepanel from "./design-planner/sidepanel/Sidepanel";
+import "@n8n/chat/dist/style.css";
+import Script from "next/script";
 
-export default function Home() {
-    return (
-        <main className="bg-black gap-2 flex flex-col min-h-screen items-center justify-center">
+function VagonPlayer() {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [url, setUrl] = useState<string | undefined>(undefined);
 
-            <div className='flex flex-wrap gap-2'>
-                <Link href="/design-planner">
-                    <button className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
-                        Start app
-                    </button>
-                </Link>
-            </div>
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_VAGON_STREAM_URL) {
+      setUrl(process.env.NEXT_PUBLIC_VAGON_STREAM_URL);
+    }
+  }, []);
 
-        </main>
-    );
+  useEffect(() => {
+    import("@n8n/chat")
+      .then(({ createChat }) => {
+        const webhookUrl =
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:5678/webhook/f4f1ffe0-dee2-472c-90d0-95ffd6919067/chat"
+            : "";
+
+        createChat({
+          webhookUrl,
+          mode: "window",
+          showWelcomeScreen: true,
+          initialMessages: ["Do you need guidance to build some steps?"],
+          i18n: {
+            en: {
+              title: "Hello",
+              subtitle: "Need help to build your system?",
+              footer: "",
+              getStarted: "New Conversation",
+              inputPlaceholder: "Type your question...",
+              closeButtonTooltip: "Close Chat",
+            },
+          },
+        });
+      })
+      .catch((err) => console.error("Failed to load chat widget", err));
+  }, []);
+
+  return (
+    <div className="flex flex-col md:flex-row w-full h-screen">
+      <Script
+        src="https://streams.vagon.io/sdk/v1/vagon.js"
+        strategy="beforeInteractive"
+      />
+
+      <div className="w-full md:w-3/4 h-1/2 md:h-full">
+        <iframe
+          ref={iframeRef}
+          id="vagon-iframe"
+          src={url}
+          className="w-full h-full border-0"
+          allowFullScreen
+        />
+      </div>
+
+      <div className="w-full md:w-1/2 h-1/2 md:h-full">
+        <Sidepanel />
+      </div>
+    </div>
+  );
 }
+
+export default VagonPlayer;
