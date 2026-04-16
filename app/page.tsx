@@ -1,27 +1,14 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 import Sidepanel from "./design-planner/sidepanel/Sidepanel";
-import Script from "next/script";
 
-function VagonPlayer() {
+function E3DSPlayer() {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const [url, setUrl] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_VAGON_STREAM_URL) {
-      setUrl(process.env.NEXT_PUBLIC_VAGON_STREAM_URL);
-    }
-  }, []);
-
+  const url = process.env.NEXT_PUBLIC_VAGON_STREAM_URL;
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-screen">
-      <Script
-        src="https://streams.vagon.io/sdk/v1/vagon.js"
-        strategy="beforeInteractive"
-      />
-
-      <div className="w-full md:w-3/4 h-1/2 md:h-full">
+    <div className="relative w-full h-screen overflow-hidden">
+      <div className="absolute inset-0 z-0">
         <iframe
           ref={iframeRef}
           id="vagon-iframe"
@@ -31,11 +18,14 @@ function VagonPlayer() {
         />
       </div>
 
-      <div className="w-full md:w-1/2 h-1/2 md:h-full">
-        <Sidepanel />
+      <div className="relative z-10 flex h-full w-full flex-col justify-end pointer-events-none md:flex-row md:justify-start">
+        <div className="hidden h-full md:block md:w-3/4" aria-hidden="true" />
+        <div className="h-1/3 w-full pointer-events-auto md:h-full md:w-1/4">
+          <Sidepanel />
+        </div>
       </div>
     </div>
   );
 }
 
-export default VagonPlayer;
+export default E3DSPlayer;
