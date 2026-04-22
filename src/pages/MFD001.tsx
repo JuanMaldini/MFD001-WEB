@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
-import { BottomBar } from "../components/BottomBar";
 import { Sidebar } from "../components/Sidebar";
-import {
-  PANEL_DEFAULT_OPEN_STATE,
-  PANEL_SHARED_UI,
-} from "../constants/panelsConfig";
+import { PANEL_DEFAULT_OPEN_STATE } from "../components/constants/panelsConfig";
 import { E3DSPlayer } from "../components/e3ds/E3DSPlayer";
 import {
   sendPayloadToUE,
@@ -20,9 +16,6 @@ export function MFD001() {
     "w-[min(252px,calc(100vw-1rem))] max-w-full";
   const [isSidebarOpen, setIsSidebarOpen] = useState(
     PANEL_DEFAULT_OPEN_STATE.sidebar,
-  );
-  const [isBottomBarOpen, setIsBottomBarOpen] = useState(
-    PANEL_DEFAULT_OPEN_STATE.bottomBar,
   );
 
   useEffect(() => {
@@ -51,12 +44,10 @@ export function MFD001() {
         <div className="w-full min-w-0 max-w-lg rounded-md border border-white/25 bg-black/30 p-6 backdrop-blur-sm">
           <h1 className="text-xl font-semibold">Missing iframe URL</h1>
           <p className="mt-2 text-sm text-white/75">
-            Current mode: <strong>{streamConfig.mode}</strong>. Add
-            {" "}
+            Current mode: <strong>{streamConfig.mode}</strong>. Add{" "}
             {streamConfig.usesE3DSWebSdk
               ? "VITE_E3DS_IFRAME_URL"
-              : "VITE_NATIVE_IFRAME_URL"}
-            {" "}
+              : "VITE_NATIVE_IFRAME_URL"}{" "}
             in your environment file to load the stream.
           </p>
         </div>
@@ -81,20 +72,6 @@ export function MFD001() {
           <Sidebar
             isOpen={isSidebarOpen}
             onToggle={() => setIsSidebarOpen((prev) => !prev)}
-            onSelectItem={handleSendPayload}
-          />
-        </div>
-
-        <div
-          className={
-            "absolute bottom-2 left-1/2 " +
-            PANEL_SHARED_UI.containerWidthClass +
-            " -translate-x-1/2 pointer-events-none"
-          }
-        >
-          <BottomBar
-            isOpen={isBottomBarOpen}
-            onToggle={() => setIsBottomBarOpen((prev) => !prev)}
             onSelectItem={handleSendPayload}
           />
         </div>

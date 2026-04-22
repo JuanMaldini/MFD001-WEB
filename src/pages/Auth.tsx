@@ -1,20 +1,23 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { CiSquareCheck } from "react-icons/ci";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   isAuthAccessKeyConfigured,
-  isMFD001Authorized,
-  setMFD001Authorized,
-  validateMFD001AccessKey,
+  isAuthorized,
+  setAuthorized,
+  validateAccessKey,
 } from "../components/auth/authConfig";
+import { getRedirectPathFromSearch } from "../components/auth/authRouting";
 
 export function AuthPage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const [accessKey, setAccessKey] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [viewportHeightPx, setViewportHeightPx] = useState<number | null>(null);
 
   const isConfigured = isAuthAccessKeyConfigured();
+  const redirectPath = getRedirectPathFromSearch(location.search);
 
   useEffect(() => {
     const updateViewportHeight = () => {
@@ -31,14 +34,17 @@ export function AuthPage() {
     window.addEventListener("resize", updateViewportHeight);
 
     return () => {
-      window.visualViewport?.removeEventListener("resize", updateViewportHeight);
+      window.visualViewport?.removeEventListener(
+        "resize",
+        updateViewportHeight,
+      );
       window.removeEventListener("orientationchange", updateViewportHeight);
       window.removeEventListener("resize", updateViewportHeight);
     };
   }, []);
 
-  if (isMFD001Authorized()) {
-    return <Navigate to="/mfd001" replace />;
+  if (isAuthorized()) {
+    return <Navigate to={redirectPath} replace />;
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -49,14 +55,14 @@ export function AuthPage() {
       return;
     }
 
-    if (!validateMFD001AccessKey(accessKey)) {
+    if (!validateAccessKey(accessKey)) {
       setErrorMessage("Invalid key.");
       return;
     }
 
-    setMFD001Authorized(true);
+    setAuthorized(true);
     setErrorMessage("");
-    navigate("/mfd001", { replace: true });
+    navigate(redirectPath, { replace: true });
   };
 
   return (
@@ -71,7 +77,10 @@ export function AuthPage() {
       }}
     >
       <div className="w-full min-w-0 max-w-md shrink-0 overflow-hidden rounded-lg border border-white/20 bg-black/25 p-2 backdrop-blur-sm">
-        <form onSubmit={handleSubmit} className="flex min-w-0 items-center gap-2">
+        <form
+          onSubmit={handleSubmit}
+          className="flex min-w-0 items-center gap-2"
+        >
           <input
             type="password"
             value={accessKey}

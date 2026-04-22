@@ -1,5 +1,5 @@
 import { IoClose, IoLocationOutline, IoLocationSharp } from "react-icons/io5";
-import { PANEL_SHARED_UI } from "../constants/panelsConfig";
+import { PANEL_SHARED_UI } from "./constants/panelsConfig";
 import { type ItemPayload } from "./e3ds/payloadItemFactory";
 import { BOTTOMBAR_LOCATION_ITEMS } from "./payload";
 

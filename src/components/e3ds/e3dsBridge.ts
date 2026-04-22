@@ -77,7 +77,7 @@ export const sendPayloadToUE = (payload: unknown): boolean => {
     value: payload,
   };
 
-  console.log("[E3DS] outgoing payload", payload);
+  console.log(payload);
   iframeWindow.postMessage(JSON.stringify(envelope), "*");
   return true;
 };

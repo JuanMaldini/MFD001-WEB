@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { buildAuthUrl } from "../components/auth/authRouting";
 
 export function Home() {
   return (
@@ -15,12 +16,26 @@ export function Home() {
         <h1 className="text-4xl font-semibold tracking-[0.04em] text-white md:text-5xl">
           MFD001
         </h1>
-        <Link
-          to="/auth"
-          className="inline-flex items-center gap-2 rounded-md bg-[#2087a3] px-6 py-3 text-sm font-bold tracking-[0.14em] text-white shadow-[0_0px_24px_rgba(32,135,163,0.4)] hver:brightness-105"
-        >
-          <span>START</span>
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            to={buildAuthUrl("/mfd001")}
+            className="inline-flex items-center gap-2 rounded-md bg-[#2087a3] px-6 py-3 text-sm font-bold tracking-[0.14em] text-white shadow-[0_0px_24px_rgba(32,135,163,0.4)] hver:brightness-105"
+          >
+            <span>START</span>
+          </Link>
+          <Link
+            to={buildAuthUrl("/operable")}
+            className="inline-flex items-center gap-2 rounded-md bg-[#2087a3] px-6 py-3 text-sm font-bold tracking-[0.14em] text-white shadow-[0_0px_24px_rgba(32,135,163,0.4)] hver:brightness-105"
+          >
+            <span>Operable</span>
+          </Link>
+          <Link
+            to={buildAuthUrl("/glass")}
+            className="inline-flex items-center gap-2 rounded-md bg-[#2087a3] px-6 py-3 text-sm font-bold tracking-[0.14em] text-white shadow-[0_0px_24px_rgba(32,135,163,0.4)] hver:brightness-105"
+          >
+            <span>Glass</span>
+          </Link>
+        </div>
       </div>
     </main>
   );

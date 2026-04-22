@@ -14,7 +14,9 @@ const normalize = (value: string | undefined): string | undefined => {
 };
 
 export const getStreamingModeConfig = (): StreamingModeConfig => {
-  const e3dsIframeUrl = normalize(import.meta.env.VITE_E3DS_IFRAME_URL as string | undefined);
+  const e3dsIframeUrl = normalize(
+    import.meta.env.VITE_E3DS_IFRAME_URL as string | undefined,
+  );
   const nativeIframeUrl = normalize(
     import.meta.env.VITE_NATIVE_IFRAME_URL as string | undefined,
   );

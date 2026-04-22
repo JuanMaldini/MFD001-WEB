@@ -4,6 +4,8 @@ export type PayloadPrimitive = string | number | boolean;
 
 export type ItemPayload = Record<string, PayloadPrimitive>;
 
+export const INPUT = "input" as const;
+
 interface BaseDisplay {
   ariaLabel: string;
 }
@@ -31,6 +33,29 @@ export interface PayloadItem {
   payload: ItemPayload;
   display: ItemDisplay;
 }
+
+export const findInputPlaceholderKey = (
+  payload: ItemPayload,
+): string | null => {
+  const entry = Object.entries(payload).find(([, value]) => value === INPUT);
+  return entry ? entry[0] : null;
+};
+
+export const resolveInputPayload = (
+  payload: ItemPayload,
+  nextValue: PayloadPrimitive,
+): ItemPayload => {
+  const inputKey = findInputPlaceholderKey(payload);
+
+  if (!inputKey) {
+    return payload;
+  }
+
+  return {
+    ...payload,
+    [inputKey]: nextValue,
+  };
+};
 
 const normalizeToken = (value: string): string => {
   return value

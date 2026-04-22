@@ -1,12 +1,24 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import {
   TbLayoutSidebarRight,
   TbLayoutSidebarRightFilled,
 } from "react-icons/tb";
-import { PANEL_SHARED_UI } from "../constants/panelsConfig";
-import { type ItemPayload } from "./e3ds/payloadItemFactory";
-import { SIDEBAR_DAYTIME_ITEMS, SIDEBAR_MOVIE_ITEMS } from "./payload";
+import type { IconType } from "react-icons";
+import { PANEL_SHARED_UI } from "./constants/panelsConfig";
+import {
+  findInputPlaceholderKey,
+  resolveInputPayload,
+  type ItemPayload,
+} from "./e3ds/payloadItemFactory";
+import { FormNumericInput } from "./formUtils/FormNumericInput";
+import {
+  convertDimensionValue,
+  DIMENSION_LIMITS_BY_UNIT,
+  normalizeToCm,
+  type DimensionUnit,
+} from "./formUtils/UnitsConversor";
+import { DIMENSIONS_ITEMS } from "./payload";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,15 +26,41 @@ interface SidebarProps {
   onSelectItem: (payload: ItemPayload) => void;
 }
 
-type DaylightMode = (typeof SIDEBAR_DAYTIME_ITEMS)[number]["id"];
-type MovieTransportState = "stopped" | "playing" | "paused";
+interface DimensionRow {
+  id: string;
+  payload: ItemPayload;
+  payloadKey: string;
+  icon: IconType;
+}
+
+const DIMENSION_UNITS: DimensionUnit[] = ["in", "cm"];
+const DEFAULT_INCH_VALUE = DIMENSION_LIMITS_BY_UNIT.in.min;
+
+const createInitialDraftValues = (): Record<string, number> => {
+  const initialValues: Record<string, number> = {};
+
+  for (const item of DIMENSIONS_ITEMS) {
+    const payloadKey = findInputPlaceholderKey(item.payload);
+
+    if (payloadKey) {
+      initialValues[payloadKey] = DEFAULT_INCH_VALUE;
+    }
+  }
+
+  return initialValues;
+};
+
+const formatDimensionLabel = (payloadKey: string): string => {
+  const baseKey = payloadKey.startsWith("p") ? payloadKey.slice(1) : payloadKey;
+  return baseKey.charAt(0).toUpperCase() + baseKey.slice(1);
+};
 
 export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
-  const [daylightMode, setDaylightMode] = useState<DaylightMode>(
-    SIDEBAR_DAYTIME_ITEMS[0].id,
-  );
-  const [movieTransportState, setMovieTransportState] =
-    useState<MovieTransportState>("stopped");
+  const [dimensionUnit, setDimensionUnit] = useState<DimensionUnit>("in");
+  const [draftValues, setDraftValues] = useState<
+    Record<string, number | undefined>
+  >(() => createInitialDraftValues());
+
   const expandableStateClass = isOpen
     ? "max-w-full flex-1 opacity-100 translate-x-0 pointer-events-auto"
     : "max-w-0 flex-[0_0_0] opacity-0 translate-x-0 pointer-events-none";
@@ -32,63 +70,72 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const toggleSlotStateClass = isOpen
     ? PANEL_SHARED_UI.sidebarToggleSlotOpenClass
     : PANEL_SHARED_UI.sidebarToggleSlotClosedClass;
-  const moviePlayItem = SIDEBAR_MOVIE_ITEMS.find(
-    (item) => item.payload.pMovie === "play",
-  );
-  const moviePauseItem = SIDEBAR_MOVIE_ITEMS.find(
-    (item) => item.payload.pMovie === "pause",
-  );
-  const movieStopItem = SIDEBAR_MOVIE_ITEMS.find(
-    (item) => item.payload.pMovie === "stop",
-  );
 
-  const renderItemContent = (item: (typeof SIDEBAR_DAYTIME_ITEMS)[number]) => {
-    if (item.display.kind === "icon") {
-      return <item.display.icon className="h-[18px] w-[18px] text-white" />;
-    }
+  const activeLimits = DIMENSION_LIMITS_BY_UNIT[dimensionUnit];
 
-    if (item.display.kind === "text") {
-      return (
-        <span className="text-[11px] font-semibold uppercase tracking-wide">
-          {item.display.text}
-        </span>
-      );
-    }
+  const dimensionRows = useMemo<DimensionRow[]>(() => {
+    return DIMENSIONS_ITEMS.map((item) => {
+      const payloadKey = findInputPlaceholderKey(item.payload);
 
-    return (
-      <img
-        src={item.display.svgPath}
-        alt={item.display.alt}
-        className="h-[18px] w-[18px]"
-      />
-    );
-  };
+      if (!payloadKey || item.display.kind !== "icon") {
+        return null;
+      }
 
-  const handleMovieToggle = () => {
-    const shouldPlay =
-      movieTransportState === "stopped" || movieTransportState === "paused";
-    const nextItem = shouldPlay ? moviePlayItem : moviePauseItem;
+      return {
+        id: item.id,
+        payload: item.payload,
+        payloadKey,
+        icon: item.display.icon,
+      };
+    }).filter((row): row is DimensionRow => row !== null);
+  }, []);
 
-    if (!nextItem) {
+  const handleUnitChange = (nextUnit: DimensionUnit) => {
+    if (nextUnit === dimensionUnit) {
       return;
     }
 
-    onSelectItem(nextItem.payload);
-    setMovieTransportState(shouldPlay ? "playing" : "paused");
+    setDraftValues((previousValues) => {
+      const nextValues: Record<string, number | undefined> = {};
+
+      for (const [payloadKey, value] of Object.entries(previousValues)) {
+        nextValues[payloadKey] =
+          typeof value === "number"
+            ? convertDimensionValue(value, dimensionUnit, nextUnit)
+            : value;
+      }
+
+      return nextValues;
+    });
+
+    setDimensionUnit(nextUnit);
   };
 
-  const handleMovieStop = () => {
-    if (movieStopItem) {
-      onSelectItem(movieStopItem.payload);
-    }
-
-    setMovieTransportState("stopped");
+  const handleDraftValueChange = (payloadKey: string, nextValue: number) => {
+    setDraftValues((previousValues) => ({
+      ...previousValues,
+      [payloadKey]: nextValue,
+    }));
   };
 
-  const movieToggleItem =
-    movieTransportState === "playing" ? moviePauseItem : moviePlayItem;
-  const movieToggleIsActive = movieTransportState !== "stopped";
-  const movieStopIsActive = movieTransportState === "stopped";
+  const commitDimensionValue = (
+    payload: ItemPayload,
+    payloadKey: string,
+    nextValue: number,
+  ) => {
+    const clampedValue = Math.min(
+      activeLimits.max,
+      Math.max(activeLimits.min, nextValue),
+    );
+    const normalizedCmValue = normalizeToCm(clampedValue, dimensionUnit);
+
+    setDraftValues((previousValues) => ({
+      ...previousValues,
+      [payloadKey]: clampedValue,
+    }));
+
+    onSelectItem(resolveInputPayload(payload, normalizedCmValue));
+  };
 
   return (
     <div className="h-auto w-full overflow-hidden bg-transparent text-white pointer-events-none">
@@ -110,7 +157,9 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
         >
           <div className="w-full min-w-0 overflow-hidden rounded border border-white bg-transparent">
             <div className="flex items-center justify-between gap-2 px-2 py-2">
-              <h2 className="text-right text-sm font-semibold">Configurator</h2>
+              <h2 className="text-right text-sm font-semibold">
+                Design Planner
+              </h2>
               <button
                 type="button"
                 onClick={onToggle}
@@ -124,79 +173,74 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
             </div>
 
             <div className="border-t border-white px-2 py-2">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-sm">Daytime</p>
-                <div className="flex items-center gap-1">
-                  {SIDEBAR_DAYTIME_ITEMS.map((item) => {
-                    const isActive = daylightMode === item.id;
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm">Dimensions</p>
+                  <div className="flex items-center gap-1 rounded border border-white/40 p-0.5">
+                    {DIMENSION_UNITS.map((unit) => {
+                      const isActive = dimensionUnit === unit;
 
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => {
-                          setDaylightMode(item.id);
-                          onSelectItem(item.payload);
-                        }}
-                        className={
-                          PANEL_SHARED_UI.sidebarOptionButtonClass +
-                          " " +
-                          (isActive
-                            ? "bg-white/[0.16] drop-shadow-[0_0_8px_rgba(255,255,255,0.65)]"
-                            : "bg-white/[0.06] hover:bg-white/[0.1] hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.55)] active:bg-white/[0.16] active:drop-shadow-[0_0_8px_rgba(255,255,255,0.65)]")
-                        }
-                        aria-label={item.display.ariaLabel}
-                        aria-pressed={isActive}
-                      >
-                        {renderItemContent(item)}
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={unit}
+                          type="button"
+                          onClick={() => handleUnitChange(unit)}
+                          aria-pressed={isActive}
+                          className={
+                            "pointer-events-auto rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide transition-all " +
+                            (isActive
+                              ? "bg-white text-black"
+                              : "text-white/80 hover:bg-white/[0.16] hover:text-white")
+                          }
+                        >
+                          {unit}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="border-t border-white px-2 py-2">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-sm">Movie</p>
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={handleMovieToggle}
-                    className={
-                      PANEL_SHARED_UI.sidebarOptionButtonClass +
-                      " " +
-                      (movieToggleIsActive
-                        ? "bg-white/[0.16] drop-shadow-[0_0_8px_rgba(255,255,255,0.65)]"
-                        : "bg-white/[0.06] hover:bg-white/[0.1] hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.55)] active:bg-white/[0.16] active:drop-shadow-[0_0_8px_rgba(255,255,255,0.65)]")
-                    }
-                    aria-label={
-                      movieTransportState === "playing"
-                        ? "Pause movie"
-                        : "Play movie"
-                    }
-                    aria-pressed={movieToggleIsActive}
-                  >
-                    {movieToggleItem
-                      ? renderItemContent(movieToggleItem)
-                      : null}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleMovieStop}
-                    className={
-                      PANEL_SHARED_UI.sidebarOptionButtonClass +
-                      " " +
-                      (movieStopIsActive
-                        ? "bg-white/[0.16] drop-shadow-[0_0_8px_rgba(255,255,255,0.65)]"
-                        : "bg-white/[0.06] hover:bg-white/[0.1] hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.55)] active:bg-white/[0.16] active:drop-shadow-[0_0_8px_rgba(255,255,255,0.65)]")
-                    }
-                    aria-label="Stop movie"
-                    aria-pressed={movieStopIsActive}
-                  >
-                    {movieStopItem ? renderItemContent(movieStopItem) : null}
-                  </button>
+                <div className="space-y-1.5">
+                  {dimensionRows.map((row) => (
+                    <div
+                      key={row.id}
+                      className="grid grid-cols-[18px_minmax(0,1fr)] items-center gap-2"
+                    >
+                      <row.icon
+                        className="h-[18px] w-[18px] text-white/85"
+                        aria-hidden
+                      />
+                      <FormNumericInput
+                        value={draftValues[row.payloadKey]}
+                        onValueChange={(nextValue) =>
+                          handleDraftValueChange(row.payloadKey, nextValue)
+                        }
+                        onCommitValue={(nextValue) =>
+                          commitDimensionValue(
+                            row.payload,
+                            row.payloadKey,
+                            nextValue,
+                          )
+                        }
+                        onCommitBlur={(nextValue) =>
+                          commitDimensionValue(
+                            row.payload,
+                            row.payloadKey,
+                            nextValue,
+                          )
+                        }
+                        min={activeLimits.min}
+                        max={activeLimits.max}
+                        step={activeLimits.step}
+                        usage="decimal"
+                        clampMode="none"
+                        styleType="minimal"
+                        placeholder=""
+                        ariaLabel={`${formatDimensionLabel(row.payloadKey)} ${dimensionUnit}`}
+                        className="pointer-events-auto h-8 w-1/2 min-w-[96px] border-white/40 bg-white/[0.08] px-2 text-xs text-white placeholder:text-white/45 focus:border-emerald-400 focus:ring-emerald-400/40"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
