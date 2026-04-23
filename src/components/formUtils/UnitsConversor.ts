@@ -11,13 +11,13 @@ const ROUND_PRECISION = 2;
 
 export const DIMENSION_LIMITS_BY_UNIT: Record<DimensionUnit, UnitLimits> = {
   in: {
-    min: 12,
-    max: 90,
+    min: 20,
+    max: 500,
     step: 0.01,
   },
   cm: {
-    min: 30.48,
-    max: 228.6,
+    min: 50,
+    max: 1270,
     step: 0.01,
   },
 };
