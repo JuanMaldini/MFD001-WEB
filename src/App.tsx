@@ -11,7 +11,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route
-        path="/mfd001"
+        path="/designplanner"
         element={
           <ProtectedRoute>
             <MFD001 />
