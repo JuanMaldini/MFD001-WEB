@@ -18,7 +18,7 @@ import {
   normalizeToCm,
   type DimensionUnit,
 } from "./formUtils/UnitsConversor";
-import { DIMENSIONS_ITEMS } from "./payload";
+import { DIMENSIONS_ITEMS, VISIBILITY_TOGGLE_MODEL } from "./payload";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -57,6 +57,7 @@ const formatDimensionLabel = (payloadKey: string): string => {
 
 export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const [dimensionUnit, setDimensionUnit] = useState<DimensionUnit>("in");
+  const [isModelVisible, setIsModelVisible] = useState(false);
   const [draftValues, setDraftValues] = useState<
     Record<string, number | undefined>
   >(() => createInitialDraftValues());
@@ -90,6 +91,15 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
     }).filter((row): row is DimensionRow => row !== null);
   }, []);
 
+  const visibilityOnItem = VISIBILITY_TOGGLE_MODEL[0];
+  const visibilityOffItem = VISIBILITY_TOGGLE_MODEL[1] ?? VISIBILITY_TOGGLE_MODEL[0];
+
+  const visibilityItem = isModelVisible ? visibilityOnItem : visibilityOffItem;
+  const VisibilityIcon =
+    visibilityItem?.display.kind === "icon"
+      ? visibilityItem.display.icon
+      : null;
+
   const handleUnitChange = (nextUnit: DimensionUnit) => {
     if (nextUnit === dimensionUnit) {
       return;
@@ -116,6 +126,20 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
       ...previousValues,
       [payloadKey]: nextValue,
     }));
+  };
+
+  const handleVisibilityToggle = () => {
+    const nextVisible = !isModelVisible;
+    const nextVisibilityItem = nextVisible
+      ? visibilityOnItem
+      : visibilityOffItem;
+
+    if (!nextVisibilityItem) {
+      return;
+    }
+
+    onSelectItem(nextVisibilityItem.payload);
+    setIsModelVisible(nextVisible);
   };
 
   const commitDimensionValue = (
@@ -176,27 +200,47 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-sm">Dimensions</p>
-                  <div className="flex items-center gap-1 rounded border border-white/40 p-0.5">
-                    {DIMENSION_UNITS.map((unit) => {
-                      const isActive = dimensionUnit === unit;
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleVisibilityToggle}
+                      aria-label={isModelVisible ? "Hide model" : "Show model"}
+                      aria-pressed={isModelVisible}
+                      className={
+                        PANEL_SHARED_UI.sidebarOptionButtonClass +
+                        " pointer-events-auto"
+                      }
+                    >
+                      {VisibilityIcon ? (
+                        <VisibilityIcon
+                          className="h-[16px] w-[16px] text-white"
+                          aria-hidden
+                        />
+                      ) : null}
+                    </button>
 
-                      return (
-                        <button
-                          key={unit}
-                          type="button"
-                          onClick={() => handleUnitChange(unit)}
-                          aria-pressed={isActive}
-                          className={
-                            "pointer-events-auto rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide transition-all " +
-                            (isActive
-                              ? "bg-white text-black"
-                              : "text-white/80 hover:bg-white/[0.16] hover:text-white")
-                          }
-                        >
-                          {unit}
-                        </button>
-                      );
-                    })}
+                    <div className="flex items-center gap-1 rounded border border-white/40 p-0.5">
+                      {DIMENSION_UNITS.map((unit) => {
+                        const isActive = dimensionUnit === unit;
+
+                        return (
+                          <button
+                            key={unit}
+                            type="button"
+                            onClick={() => handleUnitChange(unit)}
+                            aria-pressed={isActive}
+                            className={
+                              "pointer-events-auto rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide transition-all " +
+                              (isActive
+                                ? "bg-white text-black"
+                                : "text-white/80 hover:bg-white/[0.16] hover:text-white")
+                            }
+                          >
+                            {unit}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
