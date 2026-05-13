@@ -307,7 +307,7 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
             }
             aria-label={isOpen ? "Collapse panel" : "Expand panel"}
           >
-            {isOpen ? (
+            {!isOpen ? (
               <TbLayoutSidebarRightFilled
                 className={PANEL_SHARED_UI.toggleIconSizeClass}
               />

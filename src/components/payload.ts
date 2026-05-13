@@ -15,6 +15,6 @@ export const DIMENSIONS_ITEMS: PayloadItem[] = [
 ];
 
 export const VISIBILITY_TOGGLE_MODEL: PayloadItem[] = [
-  makeIconItem({ pVisibility: 1 }, FaEye),
-  makeIconItem({ pVisibility: 0 }, FaEyeSlash),
+  makeIconItem({ pCaja: 1 }, FaEyeSlash),
+  makeIconItem({ pCaja: 0 }, FaEye),
 ] 
