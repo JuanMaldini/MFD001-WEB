@@ -18,7 +18,11 @@ import {
   normalizeToCm,
   type DimensionUnit,
 } from "./formUtils/UnitsConversor";
-import { DIMENSIONS_ITEMS, VISIBILITY_TOGGLE_MODEL } from "./payload";
+import {
+  DIMENSIONS_ITEMS,
+  MOVE_TO_DOOR,
+  VISIBILITY_TOGGLE_MODEL,
+} from "./payload";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -58,6 +62,7 @@ const formatDimensionLabel = (payloadKey: string): string => {
 export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const [dimensionUnit, setDimensionUnit] = useState<DimensionUnit>("in");
   const [isModelVisible, setIsModelVisible] = useState(false);
+  const [isMovedToDoor, setIsMovedToDoor] = useState(false);
   const [draftValues, setDraftValues] = useState<
     Record<string, number | undefined>
   >(() => createInitialDraftValues());
@@ -92,12 +97,20 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   }, []);
 
   const visibilityOnItem = VISIBILITY_TOGGLE_MODEL[0];
-  const visibilityOffItem = VISIBILITY_TOGGLE_MODEL[1] ?? VISIBILITY_TOGGLE_MODEL[0];
+  const visibilityOffItem =
+    VISIBILITY_TOGGLE_MODEL[1] ?? VISIBILITY_TOGGLE_MODEL[0];
+  const moveToDoorOnItem = MOVE_TO_DOOR[0];
+  const moveToDoorOffItem = MOVE_TO_DOOR[1] ?? MOVE_TO_DOOR[0];
 
   const visibilityItem = isModelVisible ? visibilityOnItem : visibilityOffItem;
+  const moveToDoorItem = isMovedToDoor ? moveToDoorOnItem : moveToDoorOffItem;
   const VisibilityIcon =
     visibilityItem?.display.kind === "icon"
       ? visibilityItem.display.icon
+      : null;
+  const MoveToDoorIcon =
+    moveToDoorItem?.display.kind === "icon"
+      ? moveToDoorItem.display.icon
       : null;
 
   const handleUnitChange = (nextUnit: DimensionUnit) => {
@@ -121,11 +134,28 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
     setDimensionUnit(nextUnit);
   };
 
-  const handleDraftValueChange = (payloadKey: string, nextValue: number) => {
+  const handleDraftValueChange = (
+    payloadKey: string,
+    nextValue: number | undefined,
+  ) => {
     setDraftValues((previousValues) => ({
       ...previousValues,
       [payloadKey]: nextValue,
     }));
+  };
+
+  const handleMoveToDoor = () => {
+    const nextMovedToDoor = !isMovedToDoor;
+    const nextMoveToDoorItem = nextMovedToDoor
+      ? moveToDoorOnItem
+      : moveToDoorOffItem;
+
+    if (!nextMoveToDoorItem) {
+      return;
+    }
+
+    onSelectItem(nextMoveToDoorItem.payload);
+    setIsMovedToDoor(nextMovedToDoor);
   };
 
   const handleVisibilityToggle = () => {
@@ -201,6 +231,28 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-sm">Dimensions</p>
                   <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleMoveToDoor}
+                      aria-label={
+                        isMovedToDoor
+                          ? "Return model from door"
+                          : "Move model to door"
+                      }
+                      aria-pressed={isMovedToDoor}
+                      className={
+                        PANEL_SHARED_UI.sidebarOptionButtonClass +
+                        " pointer-events-auto"
+                      }
+                    >
+                      {MoveToDoorIcon ? (
+                        <MoveToDoorIcon
+                          className="h-[16px] w-[16px] text-white"
+                          aria-hidden
+                        />
+                      ) : null}
+                    </button>
+
                     <button
                       type="button"
                       onClick={handleVisibilityToggle}

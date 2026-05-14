@@ -4,7 +4,7 @@ export interface PanelDefaultOpenState {
 }
 
 export const PANEL_DEFAULT_OPEN_STATE: PanelDefaultOpenState = {
-  sidebar: false,
+  sidebar: true,
   bottomBar: false,
 };
 
