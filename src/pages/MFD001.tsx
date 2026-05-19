@@ -13,7 +13,7 @@ export function MFD001() {
   const streamConfig = getStreamingModeConfig();
   const iframeUrl = streamConfig.iframeUrl;
   const sidebarContainerWidthClass =
-    "w-[min(252px,calc(100vw-1rem))] max-w-full";
+    "w-fit max-w-[calc(100vw-1rem)]";
   const [isSidebarOpen, setIsSidebarOpen] = useState(
     PANEL_DEFAULT_OPEN_STATE.sidebar,
   );

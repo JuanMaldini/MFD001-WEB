@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import { IoClose } from "react-icons/io5";
 import {
   TbLayoutSidebarRight,
@@ -19,8 +19,10 @@ import {
   type DimensionUnit,
 } from "./formUtils/UnitsConversor";
 import {
+  CHOP_DOOR_SLIDER,
   DIMENSIONS_ITEMS,
   MOVE_TO_DOOR,
+  OPEN_DOOR_SLIDER,
   VISIBILITY_TOGGLE_MODEL,
 } from "./payload";
 
@@ -63,12 +65,14 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const [dimensionUnit, setDimensionUnit] = useState<DimensionUnit>("in");
   const [isModelVisible, setIsModelVisible] = useState(false);
   const [isMovedToDoor, setIsMovedToDoor] = useState(false);
+  const [openDoorAmount, setOpenDoorAmount] = useState(0);
+  const [chopDoorAmount, setChopDoorAmount] = useState(0);
   const [draftValues, setDraftValues] = useState<
     Record<string, number | undefined>
   >(() => createInitialDraftValues());
 
   const expandableStateClass = isOpen
-    ? "max-w-full flex-1 opacity-100 translate-x-0 pointer-events-auto"
+    ? "max-w-full flex-[1_1_auto] opacity-100 translate-x-0 pointer-events-auto"
     : "max-w-0 flex-[0_0_0] opacity-0 translate-x-0 pointer-events-none";
   const rowGapClass = isOpen
     ? PANEL_SHARED_UI.panelInlineGapOpenClass
@@ -101,6 +105,8 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
     VISIBILITY_TOGGLE_MODEL[1] ?? VISIBILITY_TOGGLE_MODEL[0];
   const moveToDoorOnItem = MOVE_TO_DOOR[0];
   const moveToDoorOffItem = MOVE_TO_DOOR[1] ?? MOVE_TO_DOOR[0];
+  const openDoorSliderItem = OPEN_DOOR_SLIDER[0];
+  const chopDoorSliderItem = CHOP_DOOR_SLIDER[0];
 
   const visibilityItem = isModelVisible ? visibilityOnItem : visibilityOffItem;
   const moveToDoorItem = isMovedToDoor ? moveToDoorOnItem : moveToDoorOffItem;
@@ -172,6 +178,40 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
     setIsModelVisible(nextVisible);
   };
 
+  const handleOpenDoorAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!openDoorSliderItem) {
+      return;
+    }
+
+    const parsedValue = Number(event.target.value);
+    if (!Number.isFinite(parsedValue)) {
+      return;
+    }
+
+    const clampedValue = Math.min(1, Math.max(0, parsedValue));
+    const roundedValue = Math.round(clampedValue * 100) / 100;
+
+    setOpenDoorAmount(roundedValue);
+    onSelectItem(resolveInputPayload(openDoorSliderItem.payload, roundedValue));
+  };
+
+  const handleChopDoorAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!chopDoorSliderItem) {
+      return;
+    }
+
+    const parsedValue = Number(event.target.value);
+    if (!Number.isFinite(parsedValue)) {
+      return;
+    }
+
+    const clampedValue = Math.min(1, Math.max(0, parsedValue));
+    const roundedValue = Math.round(clampedValue * 100) / 100;
+
+    setChopDoorAmount(roundedValue);
+    onSelectItem(resolveInputPayload(chopDoorSliderItem.payload, roundedValue));
+  };
+
   const commitDimensionValue = (
     payload: ItemPayload,
     payloadKey: string,
@@ -192,7 +232,7 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   };
 
   return (
-    <div className="h-auto w-full overflow-hidden bg-transparent text-white pointer-events-none">
+    <div className="h-auto w-fit max-w-full overflow-hidden bg-transparent text-white pointer-events-none">
       <div
         className={
           "flex min-w-0 flex-row items-center justify-end px-2 pointer-events-none " +
@@ -209,7 +249,7 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
             expandableStateClass
           }
         >
-          <div className="w-full min-w-0 overflow-hidden rounded border border-white bg-transparent">
+          <div className="w-fit min-w-[250px] max-w-full overflow-hidden rounded border border-white bg-transparent">
             <div className="flex items-center justify-between gap-2 px-2 py-2">
               <h2 className="text-right text-sm font-semibold">
                 Design Planner
@@ -228,9 +268,9 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
 
             <div className="border-t border-white px-2 py-2">
               <div className="space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm">Dimensions</p>
-                  <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-1.5">
+                  <p className="text-xs">Dimensions</p>
+                  <div className="flex min-w-0 flex-wrap items-center justify-end gap-1">
                     <button
                       type="button"
                       onClick={handleMoveToDoor}
@@ -247,7 +287,7 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                     >
                       {MoveToDoorIcon ? (
                         <MoveToDoorIcon
-                          className="h-[16px] w-[16px] text-white"
+                          className="h-[14px] w-[14px] text-white"
                           aria-hidden
                         />
                       ) : null}
@@ -265,13 +305,13 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                     >
                       {VisibilityIcon ? (
                         <VisibilityIcon
-                          className="h-[16px] w-[16px] text-white"
+                          className="h-[14px] w-[14px] text-white"
                           aria-hidden
                         />
                       ) : null}
                     </button>
 
-                    <div className="flex items-center gap-1 rounded border border-white/40 p-0.5">
+                    <div className="flex items-center gap-1 rounded border border-white/40 p-[2px]">
                       {DIMENSION_UNITS.map((unit) => {
                         const isActive = dimensionUnit === unit;
 
@@ -282,7 +322,7 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                             onClick={() => handleUnitChange(unit)}
                             aria-pressed={isActive}
                             className={
-                              "pointer-events-auto rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide transition-all " +
+                              "pointer-events-auto rounded px-1.5 py-0 text-[9px] font-semibold uppercase tracking-wide transition-all " +
                               (isActive
                                 ? "bg-white text-black"
                                 : "text-white/80 hover:bg-white/[0.16] hover:text-white")
@@ -293,6 +333,36 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                         );
                       })}
                     </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-1.5">
+                  <div className="grid grid-cols-[56px_minmax(0,1fr)] items-center gap-2">
+                    <span className="text-xs text-white/85">Open</span>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={openDoorAmount}
+                      onChange={handleOpenDoorAmountChange}
+                      aria-label="Open"
+                      className="pointer-events-auto h-2 w-full cursor-pointer accent-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-[56px_minmax(0,1fr)] items-center gap-2">
+                    <span className="text-xs text-white/85">Chop</span>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={chopDoorAmount}
+                      onChange={handleChopDoorAmountChange}
+                      aria-label="Chop"
+                      className="pointer-events-auto h-2 w-full cursor-pointer accent-white"
+                    />
                   </div>
                 </div>
 

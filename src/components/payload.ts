@@ -9,12 +9,23 @@ import { IoLocationOutline } from "react-icons/io5";
 import {
   INPUT,
   makeIconItem,
+  makeTextItem,
   type PayloadItem,
 } from "./e3ds/payloadItemFactory";
 
 export const DIMENSIONS_ITEMS: PayloadItem[] = [
   makeIconItem({ pHeight: INPUT }, TbRulerMeasure2),
   makeIconItem({ pWidth: INPUT }, TbRulerMeasure),
+];
+
+//slider working beetween 0 and 1 starting in 0.
+export const OPEN_DOOR_SLIDER: PayloadItem[] = [
+  makeTextItem({ pOpenDoor: INPUT }, "Open"),
+];
+
+//slider working beetween 0 and 1 starting in 0.
+export const CHOP_DOOR_SLIDER: PayloadItem[] = [
+  makeTextItem({ pChopDistance: INPUT }, "Chop"),
 ];
 
 export const VISIBILITY_TOGGLE_MODEL: PayloadItem[] = [
