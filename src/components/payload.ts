@@ -23,11 +23,6 @@ export const OPEN_DOOR_SLIDER: PayloadItem[] = [
   makeTextItem({ pOpenDoor: INPUT }, "Open"),
 ];
 
-//slider working beetween 0 and 1 starting in 0.
-export const CHOP_DOOR_SLIDER: PayloadItem[] = [
-  makeTextItem({ pChopDistance: INPUT }, "Chop"),
-];
-
 export const VISIBILITY_TOGGLE_MODEL: PayloadItem[] = [
   makeIconItem({ pHideBox: 1 }, FaEyeSlash),
   makeIconItem({ pHideBox: 0 }, FaEye),

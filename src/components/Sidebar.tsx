@@ -19,7 +19,6 @@ import {
   type DimensionUnit,
 } from "./formUtils/UnitsConversor";
 import {
-  CHOP_DOOR_SLIDER,
   DIMENSIONS_ITEMS,
   MOVE_TO_DOOR,
   OPEN_DOOR_SLIDER,
@@ -66,7 +65,6 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const [isModelVisible, setIsModelVisible] = useState(false);
   const [isMovedToDoor, setIsMovedToDoor] = useState(false);
   const [openDoorAmount, setOpenDoorAmount] = useState(0);
-  const [chopDoorAmount, setChopDoorAmount] = useState(0);
   const [draftValues, setDraftValues] = useState<
     Record<string, number | undefined>
   >(() => createInitialDraftValues());
@@ -106,7 +104,6 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const moveToDoorOnItem = MOVE_TO_DOOR[0];
   const moveToDoorOffItem = MOVE_TO_DOOR[1] ?? MOVE_TO_DOOR[0];
   const openDoorSliderItem = OPEN_DOOR_SLIDER[0];
-  const chopDoorSliderItem = CHOP_DOOR_SLIDER[0];
 
   const visibilityItem = isModelVisible ? visibilityOnItem : visibilityOffItem;
   const moveToDoorItem = isMovedToDoor ? moveToDoorOnItem : moveToDoorOffItem;
@@ -193,23 +190,6 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
 
     setOpenDoorAmount(roundedValue);
     onSelectItem(resolveInputPayload(openDoorSliderItem.payload, roundedValue));
-  };
-
-  const handleChopDoorAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!chopDoorSliderItem) {
-      return;
-    }
-
-    const parsedValue = Number(event.target.value);
-    if (!Number.isFinite(parsedValue)) {
-      return;
-    }
-
-    const clampedValue = Math.min(1, Math.max(0, parsedValue));
-    const roundedValue = Math.round(clampedValue * 100) / 100;
-
-    setChopDoorAmount(roundedValue);
-    onSelectItem(resolveInputPayload(chopDoorSliderItem.payload, roundedValue));
   };
 
   const commitDimensionValue = (
@@ -351,19 +331,6 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                     />
                   </div>
 
-                  <div className="grid grid-cols-[56px_minmax(0,1fr)] items-center gap-2">
-                    <span className="text-xs text-white/85">Chop</span>
-                    <input
-                      type="range"
-                      min={0}
-                      max={0.99}
-                      step={0.01}
-                      value={chopDoorAmount}
-                      onChange={handleChopDoorAmountChange}
-                      aria-label="Chop"
-                      className="pointer-events-auto h-2 w-full cursor-pointer accent-white"
-                    />
-                  </div>
                 </div>
 
                 <div className="space-y-1.5">
