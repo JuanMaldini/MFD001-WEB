@@ -25,7 +25,6 @@ import {
   MOVE_TO_DOOR,
   SETUP_TOGGLE_COOLDOWN_MS,
   TOGGLE_POCKET,
-  VISIBILITY_TOGGLE_MODEL,
 } from "./payload";
 
 interface SidebarProps {
@@ -82,7 +81,6 @@ const formatDimensionLabel = (payloadKey: string): string => {
 
 export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const [dimensionUnit, setDimensionUnit] = useState<DimensionUnit>("in");
-  const [isModelVisible, setIsModelVisible] = useState(false);
   const [isMovedToDoor, setIsMovedToDoor] = useState(false);
   const [isPocketOpen, setIsPocketOpen] = useState(false);
   const [isPaired, setIsPaired] = useState(false);
@@ -121,9 +119,6 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
     }).filter((row): row is DimensionRow => row !== null);
   }, []);
 
-  const visibilityOnItem = VISIBILITY_TOGGLE_MODEL[0];
-  const visibilityOffItem =
-    VISIBILITY_TOGGLE_MODEL[1] ?? VISIBILITY_TOGGLE_MODEL[0];
   const moveToDoorOnItem = MOVE_TO_DOOR[0];
   const moveToDoorOffItem = MOVE_TO_DOOR[1] ?? MOVE_TO_DOOR[0];
   const pocketCloseItem = TOGGLE_POCKET[0];
@@ -135,12 +130,8 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const pocketLabel = getItemLabel(isPocketOpen ? pocketOpenItem : pocketCloseItem);
   const moduleLabel = getItemLabel(isPaired ? modulePairedItem : moduleSimpleItem);
 
-  const visibilityItem = isModelVisible ? visibilityOnItem : visibilityOffItem;
   const moveToDoorItem = isMovedToDoor ? moveToDoorOnItem : moveToDoorOffItem;
-  const VisibilityIcon =
-    visibilityItem?.display.kind === "icon"
-      ? visibilityItem.display.icon
-      : null;
+
   const MoveToDoorIcon =
     moveToDoorItem?.display.kind === "icon"
       ? moveToDoorItem.display.icon
@@ -189,20 +180,6 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
 
     onSelectItem(nextMoveToDoorItem.payload);
     setIsMovedToDoor(nextMovedToDoor);
-  };
-
-  const handleVisibilityToggle = () => {
-    const nextVisible = !isModelVisible;
-    const nextVisibilityItem = nextVisible
-      ? visibilityOnItem
-      : visibilityOffItem;
-
-    if (!nextVisibilityItem) {
-      return;
-    }
-
-    onSelectItem(nextVisibilityItem.payload);
-    setIsModelVisible(nextVisible);
   };
 
   const startPocketCooldown = () => {
@@ -378,24 +355,6 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                     >
                       {MoveToDoorIcon ? (
                         <MoveToDoorIcon
-                          className="h-[14px] w-[14px] text-white"
-                          aria-hidden
-                        />
-                      ) : null}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleVisibilityToggle}
-                      aria-label={isModelVisible ? "Hide model" : "Show model"}
-                      aria-pressed={isModelVisible}
-                      className={
-                        PANEL_SHARED_UI.sidebarOptionButtonClass +
-                        " pointer-events-auto"
-                      }
-                    >
-                      {VisibilityIcon ? (
-                        <VisibilityIcon
                           className="h-[14px] w-[14px] text-white"
                           aria-hidden
                         />

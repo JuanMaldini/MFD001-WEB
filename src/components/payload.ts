@@ -23,11 +23,6 @@ export const OPEN_DOOR_SLIDER: PayloadItem[] = [
   makeTextItem({ pOpenDoor: INPUT }, "Open"),
 ];
 
-export const VISIBILITY_TOGGLE_MODEL: PayloadItem[] = [
-  makeIconItem({ pHideBox: 1 }, FaEyeSlash),
-  makeIconItem({ pHideBox: 0 }, FaEye),
-] 
-
 export const MOVE_TO_DOOR: PayloadItem[] = [
   makeIconItem({ pMoveToLocation: 50 }, IoLocationOutline),
   makeIconItem({ pMoveToLocation: 0 }, FaLocationDot),
