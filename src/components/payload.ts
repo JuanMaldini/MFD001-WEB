@@ -1,7 +1,5 @@
 import { TbRulerMeasure2 } from "react-icons/tb";
 import { TbRulerMeasure } from "react-icons/tb";
-import { FaEye } from "react-icons/fa";
-import { FaEyeSlash } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoLocationOutline } from "react-icons/io5";
 
