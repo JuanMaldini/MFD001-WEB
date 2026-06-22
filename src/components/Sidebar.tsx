@@ -341,6 +341,17 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                   <div className="flex min-w-0 flex-wrap items-center justify-end gap-1">
                     <button
                       type="button"
+                      onClick={() =>
+                        handleUnitChange(dimensionUnit === "in" ? "cm" : "in")
+                      }
+                      aria-label={`Unit: ${dimensionUnit}`}
+                      className={toggleButtonClass(false, false)}
+                    >
+                      {dimensionUnit}
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={handleMoveToDoor}
                       aria-label={
                         isMovedToDoor
@@ -359,17 +370,6 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                           aria-hidden
                         />
                       ) : null}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleUnitChange(dimensionUnit === "in" ? "cm" : "in")
-                      }
-                      aria-label={`Unit: ${dimensionUnit}`}
-                      className={toggleButtonClass(false, false)}
-                    >
-                      {dimensionUnit}
                     </button>
                   </div>
                 </div>
