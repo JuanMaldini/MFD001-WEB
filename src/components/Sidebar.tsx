@@ -25,6 +25,7 @@ import {
   MOVE_TO_DOOR,
   SETUP_TOGGLE_COOLDOWN_MS,
   TOGGLE_POCKET,
+  TOGGLE_POCKET_VISIBILITY,
 } from "./payload";
 
 interface SidebarProps {
@@ -84,6 +85,8 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const [isMovedToDoor, setIsMovedToDoor] = useState(false);
   const [isPocketOpen, setIsPocketOpen] = useState(false);
   const [isPaired, setIsPaired] = useState(false);
+  // false = pocket visible (Show). true = oculto (Hide -> palabra tachada).
+  const [isPocketHidden, setIsPocketHidden] = useState(false);
   const [pocketCooldown, setPocketCooldown] = useState(0);
   const pocketCooldownTimerRef = useRef<ReturnType<typeof setInterval> | null>(
     null,
@@ -125,6 +128,9 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
   const pocketOpenItem = TOGGLE_POCKET[1] ?? TOGGLE_POCKET[0];
   const moduleSimpleItem = MODULES_SWITCH[0];
   const modulePairedItem = MODULES_SWITCH[1] ?? MODULES_SWITCH[0];
+  const pocketShowItem = TOGGLE_POCKET_VISIBILITY[0];
+  const pocketHideItem =
+    TOGGLE_POCKET_VISIBILITY[1] ?? TOGGLE_POCKET_VISIBILITY[0];
   const isPocketDisabled = pocketCooldown > 0;
 
   const pocketLabel = getItemLabel(isPocketOpen ? pocketOpenItem : pocketCloseItem);
@@ -232,6 +238,18 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
     setIsPaired(nextPaired);
   };
 
+  const handlePocketVisibilityToggle = () => {
+    const nextHidden = !isPocketHidden;
+    const nextItem = nextHidden ? pocketHideItem : pocketShowItem;
+
+    if (!nextItem) {
+      return;
+    }
+
+    onSelectItem(nextItem.payload);
+    setIsPocketHidden(nextHidden);
+  };
+
   useEffect(() => {
     return () => {
       if (pocketCooldownTimerRef.current) {
@@ -332,6 +350,26 @@ export function Sidebar({ isOpen, onToggle, onSelectItem }: SidebarProps) {
                       className={toggleButtonClass(false, false)}
                     >
                       {moduleLabel}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handlePocketVisibilityToggle}
+                      aria-pressed={isPocketHidden}
+                      aria-label={
+                        isPocketHidden ? "Show pocket" : "Hide pocket"
+                      }
+                      className={toggleButtonClass(false, false)}
+                    >
+                      <span
+                        className={
+                          isPocketHidden
+                            ? "line-through decoration-2 opacity-70"
+                            : ""
+                        }
+                      >
+                        Pocket
+                      </span>
                     </button>
                   </div>
                 </div>

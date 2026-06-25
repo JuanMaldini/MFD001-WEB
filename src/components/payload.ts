@@ -31,6 +31,11 @@ export const TOGGLE_POCKET: PayloadItem[] = [
   makeTextItem({ pTogglePocket: 1 }, "Close"),
 ]
 
+export const TOGGLE_POCKET_VISIBILITY: PayloadItem[] = [
+  makeTextItem({ pPocketHidden: 0 }, "Pocket Show"),
+  makeTextItem({ pPocketHidden: 1 }, "Pocket Hide"),
+]
+
 export const MODULES_SWITCH: PayloadItem[] = [
   makeTextItem({ pSwitchModule: 0 }, "Simple"),
   makeTextItem({ pSwitchModule: 1 }, "Paired"),
